@@ -4741,7 +4741,7 @@ GameObject:
   - component: {fileID: 1155861682}
   m_Layer: 0
   m_Name: GameManager
-  m_TagString: GameManager
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -4759,8 +4759,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   enemiesSpawn: {fileID: 2068283956}
-  firstEnemy: {fileID: 5028321944944646370, guid: 14e474f70df118140b05265b2108243f, type: 3}
   countEnemies: 5
+  firstEnemy: {fileID: 5028321944944646370, guid: 14e474f70df118140b05265b2108243f, type: 3}
 --- !u!4 &1155861683
 Transform:
   m_ObjectHideFlags: 0

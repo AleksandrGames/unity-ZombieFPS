@@ -11,6 +11,7 @@ TagManager:
   - AmmoKit
   - FirstWeapon
   - SecondWeapon
+  - GameManager
   layers:
   - Default
   - TransparentFX

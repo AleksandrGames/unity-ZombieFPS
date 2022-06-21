@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
 namespace Assets.Scripts.Enemy
@@ -23,13 +22,9 @@ namespace Assets.Scripts.Enemy
             {
                 healthText.text = health.ToString();
             }
-            if (health <= 0)
-            {
-                gameObject.SetActive(false);
-            }
         }
 
-        public void AddHealth(int addHealth)
+        public void AddHealth(float addHealth)
         {
             if (maxHealth - health >= addHealth)
             {

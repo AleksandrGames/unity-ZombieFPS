@@ -3,23 +3,32 @@ using UnityEngine;
 using UnityEngine.AI;
 using Assets.Scripts.SO;
 using Assets.Scripts.Player;
+using Assets.Scripts.Game;
 
 namespace Assets.Scripts.Enemy
 {
     public class EnemyAi : MonoBehaviour
     {
+        [Header("Reference")]
         public EnemySO enemySO;
-        public NavMeshAgent agent;
         public Animator animatorEnemy;
-        public Transform player;
+        private Health healthScript;
+        private GameManager gameManager;
+        private NavMeshAgent agent;
+        private Transform player;
+        [Header("Stat")]
+        [SerializeField] private float walkPointRange;
+        [SerializeField] private float timeBetweenAttacks;
+        [SerializeField] private float sightRange, attackRange;
+        [SerializeField] private float timeDeath;
+        [Header("In some state")]
+        [SerializeField] private bool playerInSightRange, playerInAttackRange;
+        [SerializeField] private bool walkPointSet;
+        [SerializeField] private bool alreadyAttacked;
+        [SerializeField] private bool died;
+        [Header("Other")]
         public LayerMask WhatIsGround, WhatIsPlayer;
-        public Vector3 walkPoint;
-        public float walkPointRange;
-        public float timeBetweenAttacks;
-        public float sightRange, attackRange;
-        public bool playerInSightRange, playerInAttackRange;
-        private bool walkPointSet;
-        private bool alreadyAttacked;
+        private Vector3 walkPoint;
 
         private void Awake()
         {
@@ -28,24 +37,40 @@ namespace Assets.Scripts.Enemy
 
         private void Start()
         {
+            healthScript = GetComponent<Health>();
             player = GameObject.FindGameObjectWithTag("Player").transform;
+            gameManager = GameObject.FindGameObjectWithTag("GameManager").GetComponent<GameManager>();
         }
 
         private void Update()
         {
-            playerInSightRange = Physics.CheckSphere(transform.position, sightRange, WhatIsPlayer);
-            playerInAttackRange = Physics.CheckSphere(transform.position, attackRange, WhatIsPlayer);
-            if (!playerInSightRange && !playerInAttackRange)
+            if(healthScript.health > 0)
             {
-                Patroling();
+                if (died)
+                {
+                    Resurrection();
+                }
+                playerInSightRange = Physics.CheckSphere(transform.position, sightRange, WhatIsPlayer);
+                playerInAttackRange = Physics.CheckSphere(transform.position, attackRange, WhatIsPlayer);
+                if (!playerInSightRange && !playerInAttackRange)
+                {
+                    Patroling();
+                }
+                if (playerInSightRange && !playerInAttackRange)
+                {
+                    ChasePlayer();
+                }
+                if (playerInAttackRange && playerInSightRange)
+                {
+                    AttackPlayer();
+                }
             }
-            if (playerInSightRange && !playerInAttackRange)
+            else
             {
-                ChasePlayer();
-            }
-            if (playerInAttackRange && playerInSightRange)
-            {
-                AttackPlayer();
+                if (!died)
+                {
+                    Death();
+                }
             }
         }
 
@@ -131,6 +156,31 @@ namespace Assets.Scripts.Enemy
             {
                 animatorEnemy.SetTrigger("death");
             }
+        }
+
+        private void Resurrection()
+        {
+            died = false;
+            agent.enabled = true;
+            GetComponent<Rigidbody>().isKinematic = false;
+            GetComponent<CapsuleCollider>().enabled = true;
+        }
+
+        private void Death()
+        {
+            died = true;
+            AnimatorController("death", true);
+            StartCoroutine(DeathCoroutine());
+            agent.enabled = false;
+            GetComponent<Rigidbody>().isKinematic = true;
+            GetComponent<CapsuleCollider>().enabled = false;
+        }
+
+        private IEnumerator DeathCoroutine()
+        {
+            yield return new WaitForSeconds(timeDeath);
+            gameObject.SetActive(false);
+            gameManager.ZombieRespawn(gameObject);
         }
     }
 }

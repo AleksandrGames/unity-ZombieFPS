@@ -87,7 +87,7 @@ namespace Assets.Scripts.Weapon
             Vector3 targetPoint;
             if (Physics.Linecast(startAttack,endAttack, out RaycastHit hit))
             {
-                if (hit.collider.gameObject.GetComponent<Health>() != null)
+                if (hit.collider.gameObject.GetComponent<Health>() != null && hit.collider.gameObject.GetComponent<Health>().health > 0)
                 {
                     hit.collider.gameObject.GetComponent<Health>().TakeHit(weaponSO.damage);
                 }
